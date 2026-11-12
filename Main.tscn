@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://c3d3m4llajb1m" path="res://mesa.gd" id="1_glv2v"]
 [ext_resource type="Script" uid="uid://rnbbotl1qvnp" path="res://Baralho.gd" id="2_uu6xs"]
 
-[node name="Main" type="Node2D" unique_id=351588346]
+[node name="Mesa" type="Node2D" unique_id=351588346]
 script = ExtResource("1_glv2v")
 
 [node name="Baralho" type="Node2D" parent="." unique_id=1501577176]

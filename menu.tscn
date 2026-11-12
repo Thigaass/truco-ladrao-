@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://b50tit581t8a7"]
+
+[ext_resource type="Script" uid="uid://77m411f3d5if" path="res://menu.gd" id="1_lti8b"]
+[ext_resource type="Texture2D" uid="uid://dpo8wmidv3gek" path="res://sprites/PlaceHolders/Butao.png" id="2_ouk20"]
+
+[node name="menu" type="Control" unique_id=423173807]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_lti8b")
+
+[node name="Panel" type="Panel" parent="." unique_id=1789817645]
+layout_mode = 0
+
+[node name="Titulo" type="Label" parent="Panel" unique_id=1913860033]
+layout_mode = 0
+
+[node name="Jogar" type="TextureButton" parent="Panel" unique_id=1232249640]
+layout_mode = 0
+offset_left = 800.0
+offset_top = 930.0
+offset_right = 865.0
+offset_bottom = 995.0
+scale = Vector2(4, 1)
+texture_normal = ExtResource("2_ouk20")
+
+[node name="Sair" type="TextureButton" parent="Panel" unique_id=2008479939]
+layout_mode = 0
+offset_left = 800.0
+offset_top = 1000.0
+offset_right = 865.0
+offset_bottom = 1065.0
+scale = Vector2(4, 1)
+texture_normal = ExtResource("2_ouk20")
