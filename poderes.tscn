@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://n4cu8ahl81sy"]
+
+[ext_resource type="Script" uid="uid://drug44mdb65o7" path="res://poderes.gd" id="1_2ted1"]
+[ext_resource type="Texture2D" uid="uid://dpo8wmidv3gek" path="res://sprites/PlaceHolders/Butao.png" id="1_5kp4i"]
+
+[node name="poderes" type="Control" unique_id=509657881]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_2ted1")
+
+[node name="Panel" type="Panel" parent="." unique_id=1565684959]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Poder1" type="TextureButton" parent="Panel" unique_id=940227658]
+layout_mode = 0
+offset_left = 400.0
+offset_top = 200.0
+offset_right = 465.0
+offset_bottom = 265.0
+texture_normal = ExtResource("1_5kp4i")
+
+[node name="Poder2" type="TextureButton" parent="Panel" unique_id=1071596949]
+layout_mode = 0
+offset_left = 700.0
+offset_top = 200.0
+offset_right = 765.0
+offset_bottom = 265.0
+texture_normal = ExtResource("1_5kp4i")
+
+[node name="Poder3" type="TextureButton" parent="Panel" unique_id=304394537]
+layout_mode = 0
+offset_left = 400.0
+offset_top = 600.0
+offset_right = 465.0
+offset_bottom = 665.0
+texture_normal = ExtResource("1_5kp4i")
+
+[node name="Poder4" type="TextureButton" parent="Panel" unique_id=782136478]
+layout_mode = 0
+offset_left = 700.0
+offset_top = 600.0
+offset_right = 740.0
+offset_bottom = 640.0
+texture_normal = ExtResource("1_5kp4i")

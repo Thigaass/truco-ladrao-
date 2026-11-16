@@ -17,6 +17,14 @@ layout_mode = 0
 
 [node name="Titulo" type="Label" parent="Panel" unique_id=1913860033]
 layout_mode = 0
+offset_left = 678.00006
+offset_top = 421.0
+offset_right = 785.00006
+offset_bottom = 444.0
+scale = Vector2(5, 5)
+text = "Truco Ladrao!"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="Jogar" type="TextureButton" parent="Panel" unique_id=1232249640]
 layout_mode = 0

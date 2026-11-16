@@ -20,6 +20,9 @@ var BotaoTruco: TextureButton
 var BotaoPoder: TextureButton
 var truco: int = 0
 var primeiramao: int = 0
+var aguard_bot: bool = false
+var carta_troca: Carta
+var area_troca: Area2D
 func _ready() -> void:
 	criar_fundo()
 	baralho_node.criarBaralho()
@@ -39,16 +42,16 @@ func criar_fundo() -> void:
 func criar_botao() -> void:
 	BotaoTruco = TextureButton.new()
 	BotaoPoder = TextureButton.new()
-	BotaoTruco .texture_normal = load("res://sprites/PlaceHolders/Butao.png")
-	BotaoTruco .texture_hover = load("res://sprites/PlaceHolders/Butao.png")
-	BotaoTruco .texture_pressed = load("res://sprites/PlaceHolders/Butao.png")
+	BotaoTruco .texture_normal = load("res://sprites/PlaceHolders/BotaoAntesdeAperta.png")
+	BotaoTruco .texture_hover = load("res://sprites/PlaceHolders/BotaoAntesdeAperta.png")
+	BotaoTruco .texture_pressed = load("res://sprites/PlaceHolders/BotaoApertado.png")
 	BotaoPoder.texture_normal = load("res://sprites/PlaceHolders/Butao.png")
 	BotaoPoder.texture_hover = load("res://sprites/PlaceHolders/Butao.png")
 	BotaoPoder.texture_pressed = load("res://sprites/PlaceHolders/Butao.png")
-	BotaoTruco .position = Vector2(800,1025)
+	BotaoTruco .position = Vector2(750,950)
 	BotaoPoder.position = Vector2(1025,1025)
 	BotaoTruco .pressed.connect(trucar)
-	BotaoPoder.pressed.connect(poder)
+	BotaoPoder.pressed.connect(Globais.poder)
 	add_child(BotaoTruco)
 	add_child(BotaoPoder)
 func turno() -> void:
@@ -68,17 +71,26 @@ func turno() -> void:
 		colisao.shape = forma
 		area.add_child(colisao)
 		area.position = Vector2(775 + i *170, 850)
-		area.input_event.connect(carta_clicada.bind(carta, area))
+		area.set_meta("carta", carta)
+		area.input_event.connect(carta_clicada.bind(area))
 		add_child(area)
 	for j in range(3):
 		var carta2 = Globais.maoO[j]
 		var area2 = Area2D.new()
-		area2.input_pickable = false
+		area2.input_pickable = true
+		area2.collision_layer = 1
 		var sprite2 = Sprite2D.new()
 		sprite2.scale = Vector2(0.45, 0.45)
 		sprite2.texture = load("res://sprites/cartas/Verso.png")
 		area2.add_child(sprite2)
-		area2.position = Vector2(775 + j *170, 200)
+		var colisao2 = CollisionShape2D.new()
+		var forma2 = RectangleShape2D.new()
+		forma2.size = sprite2.texture.get_size() * sprite2.scale
+		colisao2.shape = forma2
+		area2.add_child(colisao2)
+		area2.set_meta("carta", carta2)
+		area2.input_event.connect(bot_carta_clicada.bind(area2))
+		area2.position = Vector2(775 + j * 170, 200)
 		add_child(area2)
 		areas_bot.append(area2)
 		cartas_bot.append(carta2)
@@ -87,21 +99,43 @@ func carta_clicada(
 	viewport: Node,
 	event: InputEvent,
 	shape_idx: int,
-	carta: Carta,
 	area: Area2D
 	) -> void:
 	if rodfim:
 		return
-	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			area.input_pickable = false
-			cartas_jogadas += 1
-			area.position = Vector2(485 + cartas_jogadas * 150, 525)
-			valor = carta.valor
-			Globais.maoP.erase(carta)
-			print("Voce jogou: " + carta.num + " de " + carta.naipe + " Valor: " + str(valor))
-			BotTurno()
-			return
+	if  not event is InputEventMouseButton:
+		return
+	if event.button_index != MOUSE_BUTTON_LEFT or not event.pressed:
+		return
+	if aguard_bot:
+		return
+	var carta: Carta = area.get_meta("carta")
+	if Globais.arg_carta:
+		carta.valor += 1
+		var indicador = Sprite2D.new()
+		indicador.texture = load("res://sprites/PlaceHolders/Butao.png")
+		indicador.scale = Vector2 (0.45, 0.45)
+		indicador.position = Vector2 (-60, -30)
+		indicador.z_index = 1
+		area.add_child(indicador)
+		Globais.arg_carta = false
+		Globais.poder_us = true
+		return
+	if Globais.arg_troca:
+		carta_troca = carta
+		area_troca = area
+		aguard_bot = true
+		Globais.arg_troca = false
+		print("2")
+		return
+	area.input_pickable = false
+	cartas_jogadas += 1
+	area.position = Vector2(485 + cartas_jogadas * 150, 525)
+	valor = carta.valor
+	Globais.maoP.erase(carta)
+	print("Voce jogou: " + carta.num + " de " + carta.naipe + " Valor: " + str(valor))
+	BotTurno()
+	return
 func BotTurno() -> void:
 	if cartas_bot.is_empty():
 			return
@@ -120,6 +154,35 @@ func BotTurno() -> void:
 	checar()
 	winner()
 	return
+func bot_carta_clicada(
+	viewport: Node,
+	event: InputEvent,
+	shape_idx: int,
+	area_bot: Area2D
+) -> void:
+	if rodfim or not aguard_bot:
+		return
+	if not event is InputEventMouseButton:
+		return
+	if event.button_index != MOUSE_BUTTON_LEFT or not event.pressed:
+		return
+	var carta_bot: Carta = area_bot.get_meta("carta")
+	var indice_jogador = Globais.maoP.find(carta_troca)
+	var indice_bot = cartas_bot.find(carta_bot)
+	var indice_mao_bot = Globais.maoO.find(carta_bot)
+	if indice_jogador == -1 or indice_bot == -1 or indice_mao_bot == -1:
+		return
+	Globais.maoP[indice_jogador] = carta_bot
+	Globais.maoO[indice_mao_bot] = carta_troca
+	cartas_bot[indice_bot] = carta_troca
+	area_troca.set_meta("carta", carta_bot)
+	area_bot.set_meta("carta", carta_troca)
+	var sprite = area_troca.get_child(0) as Sprite2D
+	sprite.texture = load("res://sprites/cartas/" + carta_bot.num + "_" + carta_bot.naipe + ".png")
+	aguard_bot = false
+	carta_troca = null
+	area_troca = null
+	Globais.poder_us = true
 func checar() -> void:
 	areaWEL = Area2D.new()
 	WELsprite = Sprite2D.new()
@@ -157,7 +220,7 @@ func winner() -> void:
 		bponto += ponto
 		cabo()
 		return
-	elif cartas_jogadas >= 6 or E > 0:
+	elif cartas_jogadas >= 4 and E > 0:
 		if W > L:
 			pponto += ponto
 		elif L > W:
@@ -186,6 +249,12 @@ func proxrodada() -> void:
 	botaoproxrodada = null
 	BotaoPoder.disabled = false
 	BotaoTruco.disabled = false
+	Globais.arg_carta = false
+	Globais.arg_troca = false
+	aguard_bot = false
+	carta_troca = null
+	area_troca = null
+	Globais.poder_us = false
 	W = 0
 	E = 0
 	L = 0
@@ -193,6 +262,7 @@ func proxrodada() -> void:
 	valor = 0 
 	valor2 = 0
 	truco = 0
+	ponto = 1
 	areas_bot.clear()
 	cartas_bot.clear()
 	sprites_bot.clear()
@@ -200,7 +270,7 @@ func proxrodada() -> void:
 		if filho is Area2D:
 			filho.queue_free()
 	rodfim = false
-	print("Bot:" + str(bponto) + "Vc:" + str(pponto))
+	print("Bot:" + str(bponto) + " Vc:" + str(pponto))
 	turno()
 func trucar() -> void:
 	if truco >= 4:
@@ -210,5 +280,3 @@ func trucar() -> void:
 	if truco == 4:
 		BotaoTruco.disabled = true
 		return
-func poder() -> void:
-	print("poder")

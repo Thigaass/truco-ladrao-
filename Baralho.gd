@@ -38,4 +38,3 @@ func criarBaralho() -> void:
 			if carta.num ==("3"):
 				carta.valor = 10
 			Globais.baralho.append(carta)
-			print(carta.num + " de " + carta.naipe + " Valor:" + str(carta.valor))
